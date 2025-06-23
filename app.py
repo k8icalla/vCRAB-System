@@ -42,8 +42,8 @@ db_config = {
 }
 
 email_config = {
-    "email": "icallakate0285@gmail.com",
-    "password": "yasrayvyssjpuitl",
+    "email": "",
+    "password": "",
     "smtp_server": "smtp.gmail.com",
     "smtp_port": 587
 }
