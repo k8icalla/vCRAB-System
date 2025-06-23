@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin – User Management</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-b from-slate-100 to-slate-200 min-h-screen text-gray-800 font-sans">
+
+  <!-- Page Container -->
+  <div class="max-w-6xl mx-auto px-6 py-10 space-y-8">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <h1 class="text-3xl font-extrabold text-blue-700 flex items-center gap-3">
+        <i class="fas fa-user-shield text-blue-600 text-2xl"></i>
+        User Management Panel
+      </h1>
+      <div class="flex gap-3">
+        <a href="{{ url_for('export_pending_users') }}"
+           class="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow-sm transition">
+          <i class="fas fa-download"></i>
+          Export CSV
+        </a>
+        <a href="{{ url_for('dashboard') }}"
+           class="inline-flex items-center gap-2 bg-white text-blue-700 border border-blue-300 px-4 py-2 rounded-lg hover:bg-blue-50 shadow-sm transition">
+          <i class="fas fa-arrow-left"></i>
+          Dashboard
+        </a>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="bg-white rounded-xl shadow-sm p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800">Pending User Approvals</h3>
+          <p class="text-gray-600">Review and manage user access requests</p>
+        </div>
+        <div class="text-right">
+          <div class="text-2xl font-bold text-blue-600">{{ users|length }}</div>
+          <div class="text-sm text-gray-500">Pending Users</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div>
+      <input id="searchInput" onkeyup="filterUsers()" placeholder="🔍 Search users by name or email..."
+        class="w-full px-5 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 shadow-sm bg-white placeholder-gray-500">
+    </div>
+
+    <!-- User Cards Grid -->
+    {% if users %}
+    <div id="userGrid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {% for user in users %}
+      <div class="bg-white rounded-2xl shadow-md hover:shadow-lg p-6 transition duration-200 user-card border-l-4 border-yellow-400">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <i class="fas fa-user text-blue-400"></i> {{ user.username }}
+          </h2>
+          <span class="text-xs px-2 py-1 rounded-full font-medium bg-yellow-100 text-yellow-800">
+            <i class="fas fa-clock mr-1"></i>{{ user.status|capitalize }}
+          </span>
+        </div>
+
+        <p class="text-sm text-gray-600 mb-5">
+          <i class="fas fa-envelope text-gray-400 mr-1"></i> {{ user.email }}
+        </p>
+
+        <div class="flex justify-between gap-3">
+          <a href="{{ url_for('approve_user', user_id=user.id) }}"
+             class="flex-1 inline-flex items-center justify-center gap-1 bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 font-semibold transition text-sm">
+            <i class="fas fa-check-circle"></i> Approve
+          </a>
+          <a href="{{ url_for('reject_user', user_id=user.id) }}"
+             class="flex-1 inline-flex items-center justify-center gap-1 bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 font-semibold transition text-sm">
+            <i class="fas fa-times-circle"></i> Reject
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white rounded-xl shadow-sm p-12 text-center">
+      <i class="fas fa-users text-gray-300 text-6xl mb-4"></i>
+      <h3 class="text-xl font-semibold text-gray-600 mb-2">No Pending Users</h3>
+      <p class="text-gray-500">All user requests have been processed.</p>
+    </div>
+    {% endif %}
+
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <div class="flex justify-center">
+      <nav class="flex space-x-2">
+        {% for page_num in range(1, total_pages + 1) %}
+          <a href="?page={{ page_num }}" 
+             class="px-3 py-2 rounded-lg {% if page_num == page %}bg-blue-600 text-white{% else %}bg-white text-blue-600 hover:bg-blue-50{% endif %} border border-blue-300 transition">
+            {{ page_num }}
+          </a>
+        {% endfor %}
+      </nav>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Script -->
+  <script>
+    function filterUsers() {
+      const input = document.getElementById("searchInput").value.toLowerCase();
+      document.querySelectorAll(".user-card").forEach(card => {
+        const name = card.querySelector("h2").innerText.toLowerCase();
+        const email = card.querySelector("p").innerText.toLowerCase();
+        const match = name.includes(input) || email.includes(input);
+        card.style.display = match ? "" : "none";
+      });
+    }
+
+    // Confirmation for actions
+    document.querySelectorAll('a[href*="approve"], a[href*="reject"]').forEach(link => {
+      link.addEventListener('click', function(e) {
+        const action = this.href.includes('approve') ? 'approve' : 'reject';
+        const username = this.closest('.user-card').querySelector('h2').textContent.trim().replace('👤 ', '');
+        
+        if (!confirm(`Are you sure you want to ${action} user "${username}"?`)) {
+          e.preventDefault();
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

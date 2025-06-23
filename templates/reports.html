@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V-CRAB SYSTEM - Reports</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+
+        .topbar {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.95));
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        .sidebar-transition {
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar.active {
+            transform: translateX(-100%);
+        }
+                /* Mobile menu button */
+                .menu-toggle {
+            display: none;
+        }
+        
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 1000;
+            }
+            
+            .sidebar-open {
+                transform: translateX(0);
+            }
+            
+            .topbar {
+                left: 0 !important;
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            
+            .menu-toggle {
+                display: block;
+                position: fixed;
+                top: 15px;
+                left: 15px;
+                z-index: 1100;
+                background: rgba(30, 41, 59, 0.9);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            }
+            
+            .header-card {
+                padding: 1.5rem !important;
+            }
+            
+            .control-card {
+                padding: 1.5rem !important;
+            }
+            
+            .action-button, .reset-button {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 1rem;
+            }
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .data-card {
+            transition: all 0.3s ease;
+        }
+        .data-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .table-row:hover {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0%, rgba(37, 99, 235, 0.05) 100%);
+        }
+        .pulse-blue {
+            animation: pulse-blue 2s infinite;
+        }
+        @keyframes pulse-blue {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+        }
+
+        .ping-animation {
+        animation: ping 0.8s ease-in-out;
+        }
+
+        @keyframes ping {
+        0% {
+            transform: scale(1);
+            background-color: #f87171;
+        }
+        50% {
+            transform: scale(1.3);
+            background-color: #ef4444;
+        }
+        100% {
+            transform: scale(1);
+            background-color: #f87171;
+        }
+        }
+
+
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+
+    <!-- Mobile Menu Button -->
+    <button id="menuToggle" class="menu-toggle lg:hidden">
+    <i class="fas fa-bars"></i>
+  </button>
+    
+    <div id="sidebar" class="sidebar sidebar-transition fixed top-0 left-0 w-72 h-screen bg-gradient-to-b from-slate-800 to-slate-900 shadow-2xl z-50">
+        <div class="p-6 border-b-2 border-blue-500">
+            <h2 class="text-white text-2xl font-bold text-center">🦀 V-CRAB SYSTEM</h2>
+        </div>
+
+         <nav class="mt-8 px-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="{{ url_for('dashboard') }}" class="flex items-center px-4 py-3 text-gray-300 hover:text-blue-400 hover:bg-slate-700 rounded-lg transition-all duration-200 hover:translate-x-1">
+                        <i class="fa fa-tachometer w-5 mr-3"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('controls') }}" class="flex items-center px-4 py-3 text-gray-300 hover:text-blue-400 hover:bg-slate-700 rounded-lg transition-all duration-200 hover:translate-x-1">
+                        <i class="fas fa-sliders-h w-5 mr-3"></i> Controls
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('monitoring') }}" class="flex items-center px-4 py-3 text-gray-300 hover:text-blue-400 hover:bg-slate-700 rounded-lg transition-all duration-200 hover:translate-x-1">
+                        <i class="fas fa-desktop w-5 mr-3"></i> Monitoring
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('analytics') }}" class="flex items-center px-4 py-3 text-gray-300 hover:text-blue-400 hover:bg-slate-700 rounded-lg transition-all duration-200 hover:translate-x-1">
+                        <i class="fas fa-chart-line w-5 mr-3"></i> Analytics
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('inventory') }}" class="flex items-center px-4 py-3 text-gray-300 hover:text-blue-400 hover:bg-slate-700 rounded-lg transition-all duration-200 hover:translate-x-1">
+                        <i class="fas fa-warehouse w-5 mr-3"></i> Inventory
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('reports') }}" class="flex items-center px-4 py-3 text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg">
+                        <i class="fas fa-file-alt w-5 mr-3"></i> Reports
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('notification') }}" class="flex items-center px-4 py-3 text-gray-300 hover:text-blue-400 hover:bg-slate-700 rounded-lg transition-all duration-200 hover:translate-x-1">
+                        <i class="fas fa-bell w-5 mr-3"></i> Notifications
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <button class="absolute bottom-8 left-4 right-4 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-3 rounded-lg font-semibold hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200" onclick="logout()">
+            <i class="fas fa-sign-out-alt mr-2"></i> Sign Out
+        </button>
+    </div>
+
+<!-- Topbar -->
+
+<div class="topbar fixed top-0 right-0 h-16 z-40 flex items-center justify-between px-6 shadow-lg bg-blue-600 lg:left-72">
+    <div class="flex items-center">
+      <h1 class="text-white text-xl font-semibold ml-4 lg:ml-0">Reports</h1>
+    </div>
+    <div class="flex items-center space-x-6">
+      <div class="relative">
+        <button onclick="toggleNotif()" id="notifBell" class="text-white hover:text-blue-400 transition-colors duration-200 relative">
+          <i class="fas fa-bell text-xl"></i>
+          <span id="notifCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">0</span>
+        </button>
+        <div id="notifMenu" class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 py-2 hidden z-50">
+          <h3 class="px-4 py-2 text-gray-700 font-semibold border-b">Crab Environment Status</h3>
+          <div id="notifList" class="max-h-64 overflow-y-auto px-4 py-2 text-sm text-gray-800 space-y-2">
+            <p class="text-gray-500 italic text-center">Loading notifications...</p>
+          </div>
+          <hr class="my-1">
+          <a href="{{ url_for('notification') }}" class="block px-4 py-2 text-blue-600 hover:bg-blue-50 text-center text-sm">View Full Report</a>
+        </div>
+      </div>
+
+
+      <div class="relative">
+        <div class="flex items-center space-x-3 cursor-pointer text-white hover:text-blue-400 transition-colors duration-200" onclick="toggleDropdown()">
+          <img src="{{ url_for('static', filename='images/OIP.jpg') }}" alt="User Avatar" class="w-8 h-8 lg:w-10 lg:h-10 rounded-full ring-2 ring-blue-200">
+          <span class="hidden md:inline font-medium">{{ username }}</span>
+          <i class="fas fa-chevron-down text-sm hidden md:inline"></i>
+        </div>
+      
+        <div id="dropdownMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 hidden z-50">
+          <a href="{{ url_for('profile') }}" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+            <i class="fas fa-user mr-3 text-gray-400"></i> Profile
+          </a>
+          <a href="{{ url_for('manage_users') }}" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+            <i class="fas fa-users-gear mr-3 text-gray-400"></i> Manage Users
+          </a>
+        </div>
+      </div>
+      
+      <script>
+      function toggleDropdown() {
+        const dropdown = document.getElementById('dropdownMenu');
+        dropdown.classList.toggle('hidden');
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+          if (!event.target.closest('.relative')) {
+            dropdown.classList.add('hidden');
+          }
+        }, { once: true });
+      }
+      </script>
+    </div>
+  </div>
+  </div>
+</div>
+
+<audio id="notifSound" src="https://notificationsounds.com/storage/sounds/file-sounds-1150-pristine.mp3" preload="auto"></audio>
+
+
+    <div class="lg:ml-72 pt-16 min-h-screen">
+        <div class="p-6 space-y-6">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white animate-fade-in">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-3xl font-bold mb-2">📄 Sensor Data Reports</h2>
+                        <p class="text-blue-100">Monitor and analyze your water quality sensor data</p>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="bg-white/10 rounded-lg p-4 text-center">
+                            <div class="text-2xl font-bold" id="totalRecords">0</div>
+                            <div class="text-sm text-blue-100">Total Records</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6 animate-fade-in">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-filter text-blue-600 mr-2"></i>
+                    <h3 class="text-lg font-semibold text-gray-800">Data Filters</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Start Date</label>
+                        <input type="date" id="start_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">End Date</label>
+                        <input type="date" id="end_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="fetchReport()" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-2 rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 font-medium">
+                            <i class="fas fa-search mr-2"></i>Filter Data
+                        </button>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="downloadCSV()" class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-2 rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 font-medium">
+                            <i class="fas fa-download mr-2"></i>Download CSV
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
+                <div class="data-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600">Avg Temperature</p>
+                            <p class="text-2xl font-bold text-gray-800" id="avgTemp">--°C</p>
+                        </div>
+                        <div class="bg-blue-100 p-3 rounded-full">
+                            <i class="fas fa-thermometer-half text-blue-600"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600">Avg pH Level</p>
+                            <p class="text-2xl font-bold text-gray-800" id="avgPH">--</p>
+                        </div>
+                        <div class="bg-green-100 p-3 rounded-full">
+                            <i class="fas fa-vial text-green-600"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600">Avg TDS</p>
+                            <p class="text-2xl font-bold text-gray-800" id="avgTDS">-- ppm</p>
+                        </div>
+                        <div class="bg-yellow-100 p-3 rounded-full">
+                            <i class="fas fa-tint text-yellow-600"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600">Avg Turbidity</p>
+                            <p class="text-2xl font-bold text-gray-800" id="avgTurbidity">-- NTU</p>
+                        </div>
+                        <div class="bg-purple-100 p-3 rounded-full">
+                            <i class="fas fa-eye text-purple-600"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Table -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden animate-fade-in">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fas fa-table text-gray-600 mr-2"></i>
+                            <h3 class="text-lg font-semibold text-gray-800">Sensor Data Table</h3>
+                        </div>
+                        <div id="loadingIndicator" class="hidden">
+                            <div class="flex items-center text-blue-600">
+                                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                                Loading...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <i class="fas fa-clock mr-1"></i>Timestamp
+                                </th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <i class="fas fa-thermometer-half mr-1"></i>Temperature (°C)
+                                </th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <i class="fas fa-vial mr-1"></i>pH Level
+                                </th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <i class="fas fa-tint mr-1"></i>TDS (ppm)
+                                </th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <i class="fas fa-eye mr-1"></i>Turbidity (NTU)
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTable" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                                    <div class="flex flex-col items-center">
+                                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-3"></div>
+                                        <p>Fetching sensor data...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            
+
+    <script>
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        }
+
+        function toggleDropdown() {
+            const menu = document.getElementById("dropdownMenu");
+            menu.classList.toggle('hidden');
+        }
+
+        document.addEventListener("click", function (event) {
+            const dropdown = document.getElementById("dropdownMenu");
+            const profile = document.querySelector(".profile-dropdown, [onclick='toggleDropdown()']");
+            if (!event.target.closest("[onclick='toggleDropdown()']")) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        function initPage() {
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - 7);
+            
+            document.getElementById('start_date').valueAsDate = startDate;
+            document.getElementById('end_date').valueAsDate = endDate;
+            
+            fetchReport();
+        }
+
+        function updateFileName() {
+            const input = document.getElementById('csvFileInput');
+            const fileName = document.getElementById('fileName');
+            if (input.files[0]) {
+                fileName.textContent = `Selected: ${input.files[0].name}`;
+                fileName.classList.remove('hidden');
+            }
+        }
+
+        function calculateAverages(data) {
+            if (!data || data.length === 0) return;
+            
+            const totals = data.reduce((acc, row) => {
+                acc.temp += parseFloat(row.temperature) || 0;
+                acc.ph += parseFloat(row.ph_level) || 0;
+                acc.tds += parseFloat(row.tds_value) || 0;
+                acc.turbidity += parseFloat(row.turbidity) || 0;
+                return acc;
+            }, { temp: 0, ph: 0, tds: 0, turbidity: 0 });
+            
+            const count = data.length;
+            document.getElementById('avgTemp').textContent = (totals.temp / count).toFixed(1) + '°C';
+            document.getElementById('avgPH').textContent = (totals.ph / count).toFixed(1);
+            document.getElementById('avgTDS').textContent = (totals.tds / count).toFixed(0) + ' ppm';
+            document.getElementById('avgTurbidity').textContent = (totals.turbidity / count).toFixed(1) + ' NTU';
+            document.getElementById('totalRecords').textContent = count;
+        }
+
+                // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-open');
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth < 1024 && !sidebar.contains(e.target)) {
+                if (e.target !== menuToggle && !menuToggle.contains(e.target)) {
+                    sidebar.classList.remove('sidebar-open');
+                }
+            }
+        });
+
+        function fetchReport() {
+            const loadingIndicator = document.getElementById("loadingIndicator");
+            const reportTable = document.getElementById("reportTable");
+            
+            loadingIndicator.classList.remove('hidden');
+            
+            let startDate = document.getElementById("start_date").value;
+            let endDate = document.getElementById("end_date").value;
+
+            let url = "/fetch_reports";
+            let params = [];
+            
+            if (startDate) params.push(`start=${startDate}`);
+            if (endDate) params.push(`end=${endDate}`);
+            
+            if (params.length > 0) {
+                url += "?" + params.join("&");
+            }
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    loadingIndicator.classList.add('hidden');
+                    reportTable.innerHTML = "";
+
+                    if (!data || data.length === 0) {
+                        reportTable.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                                    <div class="flex flex-col items-center">
+                                        <i class="fas fa-inbox text-4xl text-gray-300 mb-3"></i>
+                                        <p>No data available for the selected date range</p>
+                                    </div>
+                                </td>
+                            </tr>`;
+                        return;
+                    }
+
+                    calculateAverages(data);
+
+                    data.forEach((row, index) => {
+                        let tableRow = `
+                            <tr class="table-row hover:bg-blue-50 transition-colors duration-200">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-clock text-gray-400 mr-2"></i>
+                                        ${row.timestamp || 'N/A'}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <div class="flex items-center">
+                                        <div class="w-2 h-2 rounded-full bg-red-400 mr-2"></div>
+                                        ${row.temperature}°C
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <div class="flex items-center">
+                                        <div class="w-2 h-2 rounded-full bg-green-400 mr-2"></div>
+                                        ${row.ph_level}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <div class="flex items-center">
+                                        <div class="w-2 h-2 rounded-full bg-yellow-400 mr-2"></div>
+                                        ${row.tds_value} ppm
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <div class="flex items-center">
+                                        <div class="w-2 h-2 rounded-full bg-purple-400 mr-2"></div>
+                                        ${row.turbidity} NTU
+                                    </div>
+                                </td>
+                            </tr>`;
+                        reportTable.innerHTML += tableRow;
+                    });
+                })
+                .catch(error => {
+                    loadingIndicator.classList.add('hidden');
+                    console.error("Error fetching report:", error);
+                    reportTable.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="px-6 py-8 text-center text-red-500">
+                                <div class="flex flex-col items-center">
+                                    <i class="fas fa-exclamation-triangle text-4xl text-red-300 mb-3"></i>
+                                    <p>Error loading reports. Please try again.</p>
+                                </div>
+                            </td>
+                        </tr>`;
+                });
+        }
+
+        function downloadCSV() {
+            let startDate = document.getElementById("start_date").value;
+            let endDate = document.getElementById("end_date").value;
+
+            if (!startDate || !endDate) {
+                alert("Please select both Start and End dates!");
+                return;
+            }
+
+            let csvUrl = `/download_csv?start=${startDate}&end=${endDate}`;
+            window.location.href = csvUrl;
+        }
+
+        document.getElementById("uploadForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const fileInput = document.getElementById("csvFileInput");
+            
+            if (!fileInput.files[0]) {
+                alert("Please select a CSV file first!");
+                return;
+            }
+
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Analyzing...';
+            submitBtn.disabled = true;
+
+            fetch("/upload_report_predict", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                
+                if (data.error) {
+                    alert("❌ Error: " + data.error);
+                    return;
+                }
+
+                const table = document.getElementById("csvResults");
+                const resultsSection = document.getElementById("predictionResults");
+                table.innerHTML = "";
+
+                data.results.forEach(row => {
+                    const tr = document.createElement("tr");
+                    tr.className = "table-row hover:bg-blue-50 transition-colors duration-200";
+                    
+                    const predictionColor = row.prediction_result === "Unclean" ? "text-red-600 bg-red-50" : "text-green-600 bg-green-50";
+                    const predictionIcon = row.prediction_result === "Unclean" ? "fas fa-times-circle" : "fas fa-check-circle";
+
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <div class="flex items-center">
+                                <i class="fas fa-clock text-gray-400 mr-2"></i>
+                                ${row.timestamp || "N/A"}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 rounded-full bg-red-400 mr-2"></div>
+                                ${row.temperature}°C
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 rounded-full bg-green-400 mr-2"></div>
+                                ${row.ph_level}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 rounded-full bg-yellow-400 mr-2"></div>
+                                ${row.tds_value} ppm
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 rounded-full bg-purple-400 mr-2"></div>
+                                ${row.turbidity} NTU
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${predictionColor}">
+                                <i class="${predictionIcon} mr-1"></i>
+                                ${row.prediction_result}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <div class="flex items-center">
+                                <div class="w-full bg-gray-200 rounded-full h-2 mr-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: ${row.confidence || 0}%"></div>
+                                </div>
+                                ${row.confidence !== undefined ? row.confidence.toFixed(1) + '%' : '—'}
+                            </div>
+                        </td>
+                    `;
+                    table.appendChild(tr);
+                });
+
+                resultsSection.classList.remove("hidden");
+                document.getElementById("successMessage").classList.remove("hidden");
+                document.getElementById("downloadLink").classList.remove("hidden");
+                
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            })
+            .catch(err => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                console.error("Prediction failed:", err);
+                alert("❌ Prediction failed. Please check your file format and try again.");
+            });
+        });
+
+        function trainModelFromCSV() {
+            const input = document.getElementById("csvFileInput");
+            if (!input.files[0]) {
+                alert("Please upload a CSV file first.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", input.files[0]);
+            
+            const trainBtn = event.target;
+            const originalText = trainBtn.innerHTML;
+            trainBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Training...';
+            trainBtn.disabled = true;
+
+            fetch("/train_from_csv", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                trainBtn.innerHTML = originalText;
+                trainBtn.disabled = false;
+                
+                if (data.error) {
+                    alert("❌ Error: " + data.error);
+                } else {
+                    alert("✅ " + (data.message || "Model trained successfully!"));
+                }
+            })
+            .catch(error => {
+                trainBtn.innerHTML = originalText;
+                trainBtn.disabled = false;
+                console.error("Training failed:", error);
+                alert("❌ Training failed. Please check your file format and try again.");
+            });
+        }
+
+        function clearPredictions() {
+            document.getElementById("csvResults").innerHTML = "";
+            document.getElementById("predictionResults").classList.add("hidden");
+            document.getElementById("downloadLink").classList.add("hidden");
+            document.getElementById("successMessage").classList.add("hidden");
+            document.getElementById("csvFileInput").value = "";
+            document.getElementById("fileName").classList.add("hidden");
+        }
+
+        function logout() {
+            window.location.href = "/logout";
+        }
+
+        document.addEventListener('DOMContentLoaded', initPage);
+
+        const uploadArea = document.querySelector('.border-dashed');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('border-blue-400', 'bg-blue-50');
+        });
+        
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].name.endsWith('.csv')) {
+                document.getElementById('csvFileInput').files = files;
+                updateFileName();
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.querySelector('[onclick="toggleSidebar()"]');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(e.target) && 
+                !toggleBtn.contains(e.target) && 
+                !sidebar.classList.contains('active')) {
+                sidebar.classList.add('active');
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+function fetchNotifications(realTime = false) {
+  fetch('/api/notifications')
+    .then(response => response.json())
+    .then(data => {
+      const notifList = document.getElementById('notifList');
+      const notifCount = document.getElementById('notifCount');
+
+      notifList.innerHTML = '';
+      notifCount.innerText = data.length;
+
+      if (realTime && data.length > lastNotifCount) {
+        playNotifSound();
+        animateNotifBell();
+      }
+
+      lastNotifCount = data.length;
+
+      if (data.length === 0) {
+        notifList.innerHTML = '<p class="text-gray-500 italic text-center">No notifications available.</p>';
+        return;
+      }
+
+      data.slice(0, 5).forEach(item => {
+        const statusColor = item.status.toLowerCase() === 'safe' ? 'text-green-600' : 'text-red-600';
+        const notifItem = `
+          <div class="border-b pb-1">
+            <p>🔔 <strong>${item.parameter}</strong>: 
+              <span class="${statusColor} font-medium">${item.value} - ${item.status}</span>
+            </p>
+            <p class="text-xs text-gray-500">${new Date(item.timestamp).toLocaleString()}</p>
+          </div>
+        `;
+        notifList.innerHTML += notifItem;
+      });
+    })
+    .catch(err => {
+      console.error("Notification error:", err);
+    });
+}
+
+function toggleNotif() {
+  const notifMenu = document.getElementById("notifMenu");
+  notifMenu.classList.toggle("hidden");
+
+  if (!notifMenu.classList.contains("hidden")) {
+    fetchNotifications();
+  }
+}
+
+function toggleDropdown() {
+  const dropdownMenu = document.getElementById("dropdownMenu");
+  dropdownMenu.classList.toggle("hidden");
+}
+
+fetchNotifications();
+
+setInterval(() => {
+  fetchNotifications(true);
+}, 10000); 
+    </script>
+</body>
+</html>
